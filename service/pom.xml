@@ -13,6 +13,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>service_vod</module>
+        <module>service_order</module>
+        <module>service_activity</module>
+        <module>service_user</module>
+        <module>service_wechat</module>
     </modules>
 
     <dependencies>
@@ -47,10 +51,10 @@
         </dependency>
 
         <!-- 服务注册 -->
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
 
         <!-- 服务调用feign -->
         <dependency>
@@ -77,6 +81,8 @@
             <artifactId>easyexcel</artifactId>
             <version>2.1.1</version>
         </dependency>
+
+
 
     </dependencies>
 

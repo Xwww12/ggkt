@@ -3,6 +3,7 @@ package com.xw.ggkt.service.impl;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
+import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
@@ -30,6 +31,8 @@ public class FileServiceImpl implements FileService {
 
     String bucket = ConstantPropertiesUtil.BUCKET_NAME;
 
+    String domainName = ConstantPropertiesUtil.DOMAIN_NAME;
+
     @Override
     public String upload(MultipartFile file) {
         // 判断文件类型
@@ -38,7 +41,8 @@ public class FileServiceImpl implements FileService {
         }
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null ||
-                (!originalFilename.endsWith(".png") && !originalFilename.endsWith(".jpg"))) {
+                (!originalFilename.endsWith(".png") && !originalFilename.endsWith(".jpg") && !originalFilename.endsWith(".mp4"))
+        ) {
             throw new SystemException("文件格式不正确");
         }
 
@@ -61,7 +65,7 @@ public class FileServiceImpl implements FileService {
                 DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
                 // System.out.println(putRet.key);
                 // System.out.println(putRet.hash);
-                return "rsfubq2ix.hn-bkt.clouddn.com/" + key;    // 返回图片地址
+                return domainName + key;    // 返回图片地址
             } catch (QiniuException ex) {
                 Response r = ex.response;
                 System.err.println(r.toString());
@@ -83,5 +87,22 @@ public class FileServiceImpl implements FileService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
         String datePath = sdf.format(new Date());
         return datePath + name;
+    }
+
+    @Override
+    public void removeFile(String fileName) {
+        //构造一个带指定Zone对象的配置类
+        Configuration cfg = new Configuration(Region.autoRegion());
+        String key = fileName;
+        Auth auth = Auth.create(accessKey, secretKey);
+        BucketManager bucketManager = new BucketManager(auth, cfg);
+        try {
+            Response delete = bucketManager.delete(bucket, key);
+        } catch (QiniuException ex) {
+            //如果遇到异常，说明删除失败
+            ex.printStackTrace();
+            System.err.println(ex.code());
+            System.err.println(ex.response.toString());
+        }
     }
 }
